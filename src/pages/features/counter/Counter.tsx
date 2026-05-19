@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import './Counter.css'
+import styles from './Counter.module.css'
 
 function Counter() {
   const [count, setCount] = useState(0)
 
   return (
-    <main id="counter">
-      <Link to="/" className="back-link">← Home</Link>
+    <main className={styles.counter}>
+      <Link to="/" className={styles.backLink}>← Home</Link>
       <h1>Counter</h1>
       <button
-        className="counter-btn"
+        className={styles.counterBtn}
         onClick={() => setCount((c) => c + 1)}
       >
         Count is {count}

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import './Home.css'
+import styles from './Home.module.css'
 
 const features = [
   {
@@ -11,15 +11,15 @@ const features = [
 
 function Home() {
   return (
-    <main id="home">
-      <div id="home-header">
+    <main className={styles.home}>
+      <div className={styles.header}>
         <h1>fandok's lab</h1>
         <p>A collection of mini features and experiments.</p>
       </div>
-      <ul className="feature-grid">
+      <ul className={styles.featureGrid}>
         {features.map((f) => (
           <li key={f.path}>
-            <Link to={f.path} className="feature-card">
+            <Link to={f.path} className={styles.featureCard}>
               <h2>{f.title}</h2>
               <p>{f.description}</p>
             </Link>
