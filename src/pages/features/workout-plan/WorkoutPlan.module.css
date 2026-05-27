@@ -374,6 +374,19 @@
   color: #f0a500;
 }
 
+/* Phase accent text — light/dark mode aware (separate from bg accent) */
+.phase1Accent { color: #1a5f85; }
+.phase2Accent { color: #1e6b2b; }
+.phase3Accent { color: #7d5200; }
+.phase4Accent { color: #a82a4a; }
+
+@media (prefers-color-scheme: dark) {
+  .phase1Accent { color: #5ba3cc; }
+  .phase2Accent { color: #4dab5a; }
+  .phase3Accent { color: #c98a30; }
+  .phase4Accent { color: #e05070; }
+}
+
 /* Footer hint */
 .pageHint {
   text-align: center;

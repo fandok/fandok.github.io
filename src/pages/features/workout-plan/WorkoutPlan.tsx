@@ -515,14 +515,14 @@ export default function WorkoutPlan() {
 
       <div className={styles.timeline}>
         {[
-          { label: "Gym", color: "#1a5f85", flex: 5 },
-          { label: "Outdoor", color: "#1e6b2b", flex: 7 },
-          { label: "SG", color: "#7d5200", flex: 1 },
-          { label: "Race Prep", color: "#a82a4a", flex: 3 },
+          { label: "Gym", color: "#1a5f85", textClass: styles.phase1Accent, flex: 5 },
+          { label: "Outdoor", color: "#1e6b2b", textClass: styles.phase2Accent, flex: 7 },
+          { label: "SG", color: "#7d5200", textClass: styles.phase3Accent, flex: 1 },
+          { label: "Race Prep", color: "#a82a4a", textClass: styles.phase4Accent, flex: 3 },
         ].map(s => (
           <div key={s.label} className={styles.timelineSegment} style={{ flex: s.flex }}>
             <div className={styles.timelineBar} style={{ background: s.color }} />
-            <span className={styles.timelineLabel} style={{ color: s.color }}>{s.label}</span>
+            <span className={`${styles.timelineLabel} ${s.textClass}`}>{s.label}</span>
           </div>
         ))}
       </div>
@@ -564,9 +564,9 @@ export default function WorkoutPlan() {
                           <div>
                             <span className={styles.weekTitle}>Week {week.n}</span>
                             <span className={styles.weekDates}>{week.dates}</span>
-                            <div className={styles.weekFocus} style={{ color: phase.accent }}>📍 {week.focus}</div>
+                            <div className={`${styles.weekFocus} ${styles[`phase${phase.id}Accent`]}`}>📍 {week.focus}</div>
                           </div>
-                          <span className={styles.weekChevron} style={{ color: phase.accent }}>
+                          <span className={`${styles.weekChevron} ${styles[`phase${phase.id}Accent`]}`}>
                             {isOpen ? "−" : "+"}
                           </span>
                         </button>
