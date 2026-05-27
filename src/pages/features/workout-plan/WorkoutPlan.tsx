@@ -21,7 +21,7 @@ const GYM_SCENARIOS: Record<Scenario, { label: string; icon: string; color: stri
 }
 
 type DayActivity = { type: string; detail: string }
-type Day = { label: string; timing: string; keep: DayActivity; cancel: DayActivity }
+type Day = { label: string; timing: string; keep: DayActivity; cancel: DayActivity; holiday?: boolean }
 type Week = { n: number; dates: string; focus: string; days: Day[] }
 type Phase = { id: number; name: string; period: string; accent: string; lightBg: string; tag: string; weeks: Week[] }
 
@@ -29,18 +29,18 @@ const phases: Phase[] = [
   {
     id: 1,
     name: "🏋️ Phase 1: Base Building",
-    period: "May 28 – Jun 29",
+    period: "Jun 1 – Jul 5",
     accent: "#2a7fa8",
     lightBg: "#e8f4f8",
     tag: "5 weeks",
     weeks: [
       {
-        n: 1, dates: "May 28 – Jun 1", focus: "Wake up the body",
+        n: 1, dates: "Jun 1 – Jun 7", focus: "Wake up the body",
         days: [
           {
-            label: "Mon", timing: "🌙 7pm+",
-            keep: { type: "Gym – Cardio", detail: "Treadmill: 1 min run / 2 min walk × 8 rounds (24 min). Cooldown 10 min walk." },
-            cancel: { type: "Outdoor Run", detail: "Walk/run outside: 1 min jog / 2 min walk × 8. 24 min total. Any flat road or park." }
+            label: "Mon Jun 1", timing: "🌙 7pm+", holiday: true,
+            keep: { type: "Gym – Cardio", detail: "Public holiday — gym may be closed. If open: Treadmill 1 min run / 2 min walk × 8 (24 min). Otherwise do the outdoor version." },
+            cancel: { type: "Outdoor Run", detail: "Public holiday — enjoy the cooler morning. Walk/run: 1 min jog / 2 min walk × 8. 24 min total." }
           },
           {
             label: "Tue", timing: "😴 Rest",
@@ -75,7 +75,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 2, dates: "Jun 2 – Jun 8", focus: "Increase run intervals",
+        n: 2, dates: "Jun 8 – Jun 14", focus: "Increase run intervals",
         days: [
           {
             label: "Mon", timing: "🌙 7pm+",
@@ -107,14 +107,18 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 3, dates: "Jun 9 – Jun 15", focus: "Push the run longer",
+        n: 3, dates: "Jun 15 – Jun 21", focus: "Push the run longer",
         days: [
           {
             label: "Mon", timing: "🌙 7pm+",
             keep: { type: "Gym – Cardio", detail: "2 min run / 1 min walk × 8. You're running more than walking now!" },
             cancel: { type: "Outdoor Run", detail: "2 min jog / 1 min walk × 8. Keep pace comfortable." }
           },
-          { label: "Tue", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest." }, cancel: { type: "Rest", detail: "Rest." } },
+          {
+            label: "Tue Jun 16", timing: "😴 Rest", holiday: true,
+            keep: { type: "Rest", detail: "Public holiday — full rest. Enjoy the day off." },
+            cancel: { type: "Rest", detail: "Public holiday — full rest. Enjoy the day off." }
+          },
           {
             label: "Wed", timing: "🌙 7pm+",
             keep: { type: "Gym – Strength", detail: "Increase weight slightly. Add step-ups on bench 3×10 each leg. Core: plank + dead bug 3×10 each side." },
@@ -139,7 +143,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 4, dates: "Jun 16 – Jun 22", focus: "Longer run blocks",
+        n: 4, dates: "Jun 22 – Jun 28", focus: "Longer run blocks",
         days: [
           {
             label: "Mon", timing: "🌙 7pm+",
@@ -171,7 +175,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 5, dates: "Jun 23 – Jun 29", focus: "Last gym week / transition week",
+        n: 5, dates: "Jun 29 – Jul 5", focus: "Last gym week / transition week",
         days: [
           {
             label: "Mon", timing: "🌙 7pm+",
@@ -207,13 +211,13 @@ const phases: Phase[] = [
   {
     id: 2,
     name: "🏃 Phase 2: Distance Building",
-    period: "Jun 30 – Aug 14",
+    period: "Jul 6 – Aug 20",
     accent: "#2e8b3a",
     lightBg: "#edfaed",
     tag: "7 weeks",
     weeks: [
       {
-        n: 6, dates: "Jun 30 – Jul 6", focus: "First full outdoor week",
+        n: 6, dates: "Jul 6 – Jul 12", focus: "First full outdoor week",
         days: [
           {
             label: "Mon", timing: "🌙 7pm+",
@@ -245,7 +249,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 7, dates: "Jul 7 – Jul 13", focus: "Build to 5km",
+        n: 7, dates: "Jul 13 – Jul 19", focus: "Build to 5km",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "4km evening run." }, cancel: { type: "Run", detail: "4km evening run." } },
           {
@@ -265,7 +269,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 8, dates: "Jul 14 – Jul 20", focus: "Consolidate 5km",
+        n: 8, dates: "Jul 20 – Jul 26", focus: "Consolidate 5km",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "4.5km evening run." }, cancel: { type: "Run", detail: "4.5km evening run." } },
           {
@@ -285,7 +289,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 9, dates: "Jul 21 – Jul 27", focus: "Push to 6km",
+        n: 9, dates: "Jul 27 – Aug 2", focus: "Push to 6km",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "5km evening run." }, cancel: { type: "Run", detail: "5km evening run." } },
           {
@@ -305,7 +309,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 10, dates: "Jul 28 – Aug 3", focus: "Reach 7km",
+        n: 10, dates: "Aug 3 – Aug 9", focus: "Reach 7km",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "5.5km evening run." }, cancel: { type: "Run", detail: "5.5km evening run." } },
           {
@@ -325,7 +329,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 11, dates: "Aug 4 – Aug 10", focus: "Build confidence — 8km",
+        n: 11, dates: "Aug 10 – Aug 16", focus: "Build confidence — 8km",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "5km easy evening run." }, cancel: { type: "Run", detail: "5km easy evening run." } },
           {
@@ -345,12 +349,12 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 12, dates: "Aug 11 – Aug 14", focus: "Easy taper before travel",
+        n: 12, dates: "Aug 17 – Aug 20", focus: "Easy taper before travel",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Easy Run", detail: "4km loose easy jog." }, cancel: { type: "Easy Run", detail: "4km loose easy jog." } },
           { label: "Tue", timing: "🌙 7pm+", keep: { type: "Light Strength", detail: "20 min easy: squats, lunges, plank. Low intensity." }, cancel: { type: "Light Bodyweight", detail: "20 min easy: squats, lunges, plank. Low intensity." } },
           { label: "Wed", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest. Final packing." }, cancel: { type: "Rest", detail: "Rest. Final packing." } },
-          { label: "Thu Aug 14", timing: "😴 Rest", keep: { type: "Rest", detail: "Full rest before travel day." }, cancel: { type: "Rest", detail: "Full rest before travel day." } },
+          { label: "Thu Aug 20", timing: "😴 Rest", keep: { type: "Rest", detail: "Full rest before travel day." }, cancel: { type: "Rest", detail: "Full rest before travel day." } },
         ]
       },
     ]
@@ -358,18 +362,23 @@ const phases: Phase[] = [
   {
     id: 3,
     name: "✈️ Singapore",
-    period: "Aug 15 – 19",
+    period: "Aug 21 – 25",
     accent: "#b07800",
     lightBg: "#fff8e8",
     tag: "Active Rest",
     weeks: [
       {
-        n: 13, dates: "Aug 15 – Aug 19", focus: "Enjoy it — this IS your training",
+        n: 13, dates: "Aug 21 – Aug 25", focus: "Enjoy it — this IS your training",
         days: [
           {
-            label: "All 5 days", timing: "🌞 All day",
+            label: "Fri–Mon", timing: "🌞 All day",
             keep: { type: "Active Tourism", detail: "8–15km of walking daily naturally. No structured runs. This is active rest. Your body is adapting to heat and humidity — exactly what race day feels like." },
             cancel: { type: "Active Tourism", detail: "8–15km of walking daily. No structured runs. The heat exposure is bonus race prep." }
+          },
+          {
+            label: "Tue Aug 25", timing: "🌞 All day", holiday: true,
+            keep: { type: "Active Tourism", detail: "Public holiday — last day in Singapore. Easy walking, sightseeing. Rest up for the flight home tomorrow." },
+            cancel: { type: "Active Tourism", detail: "Public holiday — last day in Singapore. Take it easy, rest the legs." }
           },
           {
             label: "Key tip", timing: "💧",
@@ -383,15 +392,15 @@ const phases: Phase[] = [
   {
     id: 4,
     name: "🎯 Phase 3: Race Prep",
-    period: "Aug 20 – Sep 5",
+    period: "Aug 26 – Sep 12",
     accent: "#a82a4a",
     lightBg: "#f8eef0",
     tag: "3 weeks",
     weeks: [
       {
-        n: 14, dates: "Aug 20 – Aug 24", focus: "Back from Singapore — reset",
+        n: 14, dates: "Aug 26 – Aug 31", focus: "Back from Singapore — reset",
         days: [
-          { label: "Wed Aug 20", timing: "🌙 7pm+", keep: { type: "Easy Run", detail: "3–4km easy. Shake off travel. Don't force pace." }, cancel: { type: "Easy Run", detail: "3–4km easy shakeout." } },
+          { label: "Wed Aug 26", timing: "🌙 7pm+", keep: { type: "Easy Run", detail: "3–4km easy. Shake off travel. Don't force pace." }, cancel: { type: "Easy Run", detail: "3–4km easy shakeout." } },
           { label: "Thu", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest if legs feel tired from Singapore." }, cancel: { type: "Rest", detail: "Rest." } },
           { label: "Fri", timing: "🌙 7pm+", keep: { type: "Run", detail: "5km comfortable evening run." }, cancel: { type: "Run", detail: "5km comfortable run." } },
           {
@@ -407,7 +416,7 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 15, dates: "Aug 25 – Aug 31", focus: "Taper — reduce volume, keep sharpness",
+        n: 15, dates: "Sep 1 – Sep 7", focus: "Taper — reduce volume, keep sharpness",
         days: [
           { label: "Mon", timing: "🌙 7pm+", keep: { type: "Run", detail: "5km easy." }, cancel: { type: "Run", detail: "5km easy." } },
           {
@@ -423,13 +432,13 @@ const phases: Phase[] = [
         ]
       },
       {
-        n: 16, dates: "Sep 1 – Sep 5", focus: "Race week — protect the body",
+        n: 16, dates: "Sep 8 – Sep 12", focus: "Race week — protect the body",
         days: [
-          { label: "Mon Sep 1", timing: "🌙 7pm+", keep: { type: "Easy Run", detail: "3km very light jog. Keep legs moving." }, cancel: { type: "Easy Run", detail: "3km very light jog." } },
-          { label: "Tue Sep 2", timing: "😴 Rest", keep: { type: "Rest", detail: "Full rest." }, cancel: { type: "Rest", detail: "Full rest." } },
-          { label: "Wed Sep 3", timing: "🌙 7pm+", keep: { type: "Activation Run", detail: "2km easy + 4 × 30s light accelerations. Wake the legs up, don't tire them." }, cancel: { type: "Activation Run", detail: "2km easy + 4 × 30s strides. Activate, don't drain." } },
-          { label: "Thu Sep 4", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest. Lay out your race kit tonight. Check bib, shoes, socks." }, cancel: { type: "Rest", detail: "Rest. Prepare race kit tonight." } },
-          { label: "Fri Sep 5", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest. Light stretch only. Eat well (carbs). Sleep by 10pm." }, cancel: { type: "Rest", detail: "Rest. Eat carbs. Sleep early." } },
+          { label: "Mon Sep 8", timing: "🌙 7pm+", keep: { type: "Easy Run", detail: "3km very light jog. Keep legs moving." }, cancel: { type: "Easy Run", detail: "3km very light jog." } },
+          { label: "Tue Sep 9", timing: "😴 Rest", keep: { type: "Rest", detail: "Full rest." }, cancel: { type: "Rest", detail: "Full rest." } },
+          { label: "Wed Sep 10", timing: "🌙 7pm+", keep: { type: "Activation Run", detail: "2km easy + 4 × 30s light accelerations. Wake the legs up, don't tire them." }, cancel: { type: "Activation Run", detail: "2km easy + 4 × 30s strides. Activate, don't drain." } },
+          { label: "Thu Sep 11", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest. Lay out your race kit tonight. Check bib, shoes, socks." }, cancel: { type: "Rest", detail: "Rest. Prepare race kit tonight." } },
+          { label: "Fri Sep 12", timing: "😴 Rest", keep: { type: "Rest", detail: "Rest. Light stretch only. Eat well (carbs). Sleep by 10pm." }, cancel: { type: "Rest", detail: "Rest. Eat carbs. Sleep early." } },
         ]
       },
     ]
@@ -444,7 +453,8 @@ const typeColors: Record<string, { bg: string; text: string }> = {
   "Long Run": { bg: "#a8e6a8", text: "#0d4d0d" },
   "Long Run ⭐ 5km": { bg: "#7dd87d", text: "#0d4d0d" },
   "Long Run ⭐ 7km": { bg: "#5ccc5c", text: "#083408" },
-  "Long Run ⭐ 9km": { bg: "#3cbc3c", text: "#062806" },
+  "Long Run ⭐ 8km": { bg: "#3cbc3c", text: "#062806" },
+  "Long Run ⭐ 9km": { bg: "#2aaa2a", text: "#041e04" },
   "Easy Run": { bg: "#c8f0c8", text: "#1a6e1a" },
   "Outdoor Run": { bg: "#d4f5d4", text: "#1a6e1a" },
   "Outdoor Long Run": { bg: "#a8e6a8", text: "#0d4d0d" },
@@ -491,7 +501,7 @@ export default function WorkoutPlan() {
         <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#1a1a1a", margin: "0 0 6px", lineHeight: 1.2 }}>
           Singapore + 10km Race
         </h1>
-        <p style={{ color: "#777", fontSize: 13, margin: 0 }}>May 28 → September 6 · Target: under 90 min</p>
+        <p style={{ color: "#777", fontSize: 13, margin: 0 }}>Jun 1 → September 13 · Target: under 90 min</p>
         <p style={{ color: "#999", fontSize: 12, margin: "4px 0 0" }}>Weekdays after 7pm · Weekend mornings</p>
       </div>
 
@@ -601,7 +611,12 @@ export default function WorkoutPlan() {
                               alignItems: "flex-start"
                             }}>
                               <div style={{ minWidth: 44 }}>
-                                <div style={{ fontSize: 11, fontWeight: "bold", color: "#888" }}>{day.label}</div>
+                                <div style={{ fontSize: 11, fontWeight: "bold", color: "#888", display: "flex", alignItems: "center", gap: 3 }}>
+                                  {day.label}
+                                  {day.holiday && (
+                                    <span style={{ fontSize: 9, background: "#ffefc0", color: "#a06000", borderRadius: 3, padding: "1px 4px", fontWeight: "bold" }}>PH</span>
+                                  )}
+                                </div>
                                 <div style={{ fontSize: 10, color: "#bbb" }}>{day.timing}</div>
                               </div>
                               <div style={{ flex: 1 }}>
@@ -633,7 +648,7 @@ export default function WorkoutPlan() {
         boxShadow: "0 4px 20px rgba(0,0,0,0.2)", marginTop: 8
       }}>
         <div style={{ fontSize: 22, fontWeight: "bold", marginBottom: 4 }}>🏁 Race Day</div>
-        <div style={{ fontSize: 13, color: "#aaa", marginBottom: 14 }}>September 6 · 10km · Target: under 90 minutes</div>
+        <div style={{ fontSize: 13, color: "#aaa", marginBottom: 14 }}>September 13 · 10km · Target: under 90 minutes</div>
         {[
           "Start SLOW — first 2km should feel almost too easy",
           "Target pace: 9 min/km (or 9:30 for first half)",
