@@ -8,14 +8,14 @@ const GYM_SCENARIOS: Record<Scenario, { label: string; icon: string; color: stri
   keep: {
     label: "Keep Gym",
     icon: "🏋️",
-    color: "#2a7fa8",
+    color: "#1a5f85",
     bg: "#dbeeff",
     desc: "Gym available throughout. Best for knee protection & rainy nights."
   },
   cancel: {
     label: "Cancel Gym",
     icon: "🏃",
-    color: "#2e8b3a",
+    color: "#1e6b2b",
     bg: "#d4f5d4",
     desc: "Outdoor + bodyweight only. Still achievable — need more discipline on strength days."
   }
@@ -31,7 +31,7 @@ const phases: Phase[] = [
     id: 1,
     name: "🏋️ Phase 1: Base Building",
     period: "Jun 1 – Jul 5",
-    accent: "#2a7fa8",
+    accent: "#1a5f85",
     tag: "5 weeks",
     weeks: [
       {
@@ -212,7 +212,7 @@ const phases: Phase[] = [
     id: 2,
     name: "🏃 Phase 2: Distance Building",
     period: "Jul 6 – Aug 20",
-    accent: "#2e8b3a",
+    accent: "#1e6b2b",
     tag: "7 weeks",
     weeks: [
       {
@@ -362,7 +362,7 @@ const phases: Phase[] = [
     id: 3,
     name: "✈️ Singapore",
     period: "Aug 21 – 25",
-    accent: "#b07800",
+    accent: "#7d5200",
     tag: "Active Rest",
     weeks: [
       {
@@ -515,9 +515,9 @@ export default function WorkoutPlan() {
 
       <div className={styles.timeline}>
         {[
-          { label: "Gym", color: "#2a7fa8", flex: 5 },
-          { label: "Outdoor", color: "#2e8b3a", flex: 7 },
-          { label: "SG", color: "#b07800", flex: 1 },
+          { label: "Gym", color: "#1a5f85", flex: 5 },
+          { label: "Outdoor", color: "#1e6b2b", flex: 7 },
+          { label: "SG", color: "#7d5200", flex: 1 },
           { label: "Race Prep", color: "#a82a4a", flex: 3 },
         ].map(s => (
           <div key={s.label} className={styles.timelineSegment} style={{ flex: s.flex }}>
