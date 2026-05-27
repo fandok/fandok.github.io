@@ -1,0 +1,394 @@
+.page {
+  text-align: left;
+  padding: 40px 24px 60px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.back {
+  margin-bottom: 16px;
+}
+
+.back a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.back a:hover {
+  opacity: 1;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  opacity: 0.7;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: var(--text);
+  font-size: 14px;
+  margin: 0;
+}
+
+.subtitleSmall {
+  color: var(--text);
+  font-size: 13px;
+  margin: 4px 0 0;
+  opacity: 0.6;
+}
+
+/* Scenario card */
+.scenarioCard {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.scenarioCardLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  opacity: 0.7;
+}
+
+.scenarioToggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.scenarioBtn {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--code-bg);
+  color: var(--text);
+  font-family: var(--sans);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.scenarioBtn:hover {
+  border-color: var(--accent-border);
+}
+
+.scenarioBtnActive {
+  border-color: transparent;
+  color: #fff;
+}
+
+.scenarioDesc {
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  color: #1a2a38;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 20px;
+}
+
+.timelineSegment {
+  text-align: center;
+  min-width: 0;
+}
+
+.timelineBar {
+  height: 5px;
+  border-radius: 3px;
+  margin-bottom: 3px;
+}
+
+.timelineLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Phases */
+.phases {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.phaseHeader {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-family: var(--sans);
+  color: #fff;
+  text-align: left;
+  transition: opacity 0.15s;
+}
+
+.phaseHeader:hover {
+  opacity: 0.9;
+}
+
+.phaseName {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.phasePeriod {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.phaseRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.phaseTag {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.phaseChevron {
+  font-size: 14px;
+}
+
+/* Weeks */
+.weeks {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weekCard {
+  background: var(--bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+.weekHeader {
+  width: 100%;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  font-family: var(--sans);
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.weekHeader:hover {
+  background: var(--code-bg);
+}
+
+.weekTitle {
+  font-weight: 700;
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.weekDates {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.weekFocus {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.weekChevron {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Days */
+.days {
+  padding: 0 14px 12px;
+}
+
+.day {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.dayMeta {
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.dayLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.holidayBadge {
+  font-size: 9px;
+  background: #ffefc0;
+  color: #7a4800;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-weight: 700;
+}
+
+.dayTiming {
+  font-size: 10px;
+  color: var(--text);
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+.dayContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityBadge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.activityDetail {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Race day */
+.raceDay {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.raceDayTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.raceDaySubtitle {
+  font-size: 13px;
+  color: #aaa;
+  margin: 0 0 14px;
+}
+
+.raceTip {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 9px;
+  align-items: flex-start;
+}
+
+.raceTipArrow {
+  color: #f0a500;
+  font-size: 13px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.raceTipText {
+  font-size: 13px;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.raceDayFinish {
+  margin-top: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0a500;
+}
+
+/* Footer hint */
+.pageHint {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 24px 16px 48px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+}

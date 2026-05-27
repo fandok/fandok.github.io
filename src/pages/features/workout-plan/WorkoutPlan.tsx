@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import styles from "./WorkoutPlan.module.css"
 
 type Scenario = "keep" | "cancel"
 
@@ -7,14 +8,14 @@ const GYM_SCENARIOS: Record<Scenario, { label: string; icon: string; color: stri
   keep: {
     label: "Keep Gym",
     icon: "🏋️",
-    color: "#2a7fa8",
+    color: "#1a5f85",
     bg: "#dbeeff",
     desc: "Gym available throughout. Best for knee protection & rainy nights."
   },
   cancel: {
     label: "Cancel Gym",
     icon: "🏃",
-    color: "#2e8b3a",
+    color: "#1e6b2b",
     bg: "#d4f5d4",
     desc: "Outdoor + bodyweight only. Still achievable — need more discipline on strength days."
   }
@@ -23,15 +24,14 @@ const GYM_SCENARIOS: Record<Scenario, { label: string; icon: string; color: stri
 type DayActivity = { type: string; detail: string }
 type Day = { label: string; timing: string; keep: DayActivity; cancel: DayActivity; holiday?: boolean }
 type Week = { n: number; dates: string; focus: string; days: Day[] }
-type Phase = { id: number; name: string; period: string; accent: string; lightBg: string; tag: string; weeks: Week[] }
+type Phase = { id: number; name: string; period: string; accent: string; tag: string; weeks: Week[] }
 
 const phases: Phase[] = [
   {
     id: 1,
     name: "🏋️ Phase 1: Base Building",
     period: "Jun 1 – Jul 5",
-    accent: "#2a7fa8",
-    lightBg: "#e8f4f8",
+    accent: "#1a5f85",
     tag: "5 weeks",
     weeks: [
       {
@@ -212,8 +212,7 @@ const phases: Phase[] = [
     id: 2,
     name: "🏃 Phase 2: Distance Building",
     period: "Jul 6 – Aug 20",
-    accent: "#2e8b3a",
-    lightBg: "#edfaed",
+    accent: "#1e6b2b",
     tag: "7 weeks",
     weeks: [
       {
@@ -363,8 +362,7 @@ const phases: Phase[] = [
     id: 3,
     name: "✈️ Singapore",
     period: "Aug 21 – 25",
-    accent: "#b07800",
-    lightBg: "#fff8e8",
+    accent: "#7d5200",
     tag: "Active Rest",
     weeks: [
       {
@@ -394,7 +392,6 @@ const phases: Phase[] = [
     name: "🎯 Phase 3: Race Prep",
     period: "Aug 26 – Sep 12",
     accent: "#a82a4a",
-    lightBg: "#f8eef0",
     tag: "3 weeks",
     weeks: [
       {
@@ -475,6 +472,7 @@ export default function WorkoutPlan() {
   const [expandedPhase, setExpandedPhase] = useState<number | null>(1)
   const [expandedWeek, setExpandedWeek] = useState<string | null>(null)
 
+  const togglePhase = (id: number) => setExpandedPhase(expandedPhase === id ? null : id)
   const toggleWeek = (phaseId: number, weekN: number) => {
     const key = `${phaseId}-${weekN}`
     setExpandedWeek(expandedWeek === key ? null : key)
@@ -483,172 +481,137 @@ export default function WorkoutPlan() {
   const sc = GYM_SCENARIOS[scenario]
 
   return (
-    <div style={{
-      fontFamily: "'Georgia', serif",
-      background: "#f7f5f2",
-      minHeight: "100vh",
-      padding: "20px 16px 40px",
-      maxWidth: 680,
-      margin: "0 auto",
-    }}>
-      <div style={{ marginBottom: 16 }}>
-        <Link to="/" style={{ color: "#999", textDecoration: "none", fontSize: 13 }}>← Home</Link>
+    <div className={styles.page}>
+      <div className={styles.back}>
+        <Link to="/">← Home</Link>
       </div>
 
-      {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <div style={{ fontSize: 11, letterSpacing: 3, color: "#999", textTransform: "uppercase", marginBottom: 6 }}>15-Week Training Plan</div>
-        <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#1a1a1a", margin: "0 0 6px", lineHeight: 1.2 }}>
-          Singapore + 10km Race
-        </h1>
-        <p style={{ color: "#777", fontSize: 13, margin: 0 }}>Jun 1 → September 13 · Target: under 90 min</p>
-        <p style={{ color: "#999", fontSize: 12, margin: "4px 0 0" }}>Weekdays after 7pm · Weekend mornings</p>
-      </div>
+      <header className={styles.header}>
+        <p className={styles.label}>15-Week Training Plan</p>
+        <h1 className={styles.title}>Singapore + 10km Race</h1>
+        <p className={styles.subtitle}>Jun 1 → September 13 · Target: under 90 min</p>
+        <p className={styles.subtitleSmall}>Weekdays after 7pm · Weekend mornings</p>
+      </header>
 
-      {/* Gym Scenario Toggle */}
-      <div style={{ background: "#fff", borderRadius: 14, padding: 16, marginBottom: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-        <div style={{ fontSize: 12, fontWeight: "bold", color: "#888", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
-          Gym membership?
-        </div>
-        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-          {(Object.entries(GYM_SCENARIOS) as [Scenario, typeof GYM_SCENARIOS[Scenario]][]).map(([key, s]) => (
+      <div className={styles.scenarioCard}>
+        <p className={styles.scenarioCardLabel}>Gym membership?</p>
+        <div className={styles.scenarioToggle}>
+          {(Object.entries(GYM_SCENARIOS) as [Scenario, (typeof GYM_SCENARIOS)[Scenario]][]).map(([key, s]) => (
             <button
               key={key}
               onClick={() => setScenario(key)}
-              style={{
-                flex: 1, padding: "10px 8px", borderRadius: 10, border: "none",
-                cursor: "pointer", transition: "all 0.2s",
-                background: scenario === key ? s.color : "#f0f0f0",
-                color: scenario === key ? "#fff" : "#666",
-                fontWeight: "bold", fontSize: 13,
-              }}
+              className={`${styles.scenarioBtn} ${scenario === key ? styles.scenarioBtnActive : ""}`}
+              style={scenario === key ? { background: s.color } : undefined}
+              aria-pressed={scenario === key}
             >
               {s.icon} {s.label}
             </button>
           ))}
         </div>
-        <div style={{
-          background: sc.bg, borderRadius: 8, padding: "10px 12px",
-          fontSize: 13, color: "#444", lineHeight: 1.5
-        }}>
+        <p className={styles.scenarioDesc} style={{ background: sc.bg }}>
           {sc.desc}
-        </div>
+        </p>
       </div>
 
-      {/* Timeline bar */}
-      <div style={{ display: "flex", gap: 3, marginBottom: 20 }}>
+      <div className={styles.timeline}>
         {[
-          { label: "Gym", color: "#2a7fa8", flex: 5 },
-          { label: "Outdoor", color: "#2e8b3a", flex: 7 },
-          { label: "SG", color: "#b07800", flex: 1 },
+          { label: "Gym", color: "#1a5f85", flex: 5 },
+          { label: "Outdoor", color: "#1e6b2b", flex: 7 },
+          { label: "SG", color: "#7d5200", flex: 1 },
           { label: "Race Prep", color: "#a82a4a", flex: 3 },
         ].map(s => (
-          <div key={s.label} style={{ flex: s.flex, textAlign: "center" }}>
-            <div style={{ height: 5, background: s.color, borderRadius: 3, marginBottom: 3 }} />
-            <div style={{ fontSize: 9, color: s.color, fontWeight: "bold", letterSpacing: 0.5 }}>{s.label}</div>
+          <div key={s.label} className={styles.timelineSegment} style={{ flex: s.flex }}>
+            <div className={styles.timelineBar} style={{ background: s.color }} />
+            <span className={styles.timelineLabel} style={{ color: s.color }}>{s.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Phases */}
-      {phases.map(phase => (
-        <div key={phase.id} style={{ marginBottom: 16 }}>
-          <div
-            onClick={() => setExpandedPhase(expandedPhase === phase.id ? null : phase.id)}
-            style={{
-              background: phase.accent, color: "#fff", borderRadius: 12,
-              padding: "14px 16px", cursor: "pointer",
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.12)"
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 16, fontWeight: "bold" }}>{phase.name}</div>
-              <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>{phase.period}</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: "bold" }}>{phase.tag}</span>
-              <span style={{ fontSize: 16 }}>{expandedPhase === phase.id ? "▲" : "▼"}</span>
-            </div>
-          </div>
+      <div className={styles.phases}>
+        {phases.map(phase => {
+          const isPhaseOpen = expandedPhase === phase.id
+          return (
+            <div key={phase.id}>
+              <button
+                className={styles.phaseHeader}
+                style={{ background: phase.accent }}
+                onClick={() => togglePhase(phase.id)}
+                aria-expanded={isPhaseOpen}
+              >
+                <div>
+                  <div className={styles.phaseName}>{phase.name}</div>
+                  <div className={styles.phasePeriod}>{phase.period}</div>
+                </div>
+                <div className={styles.phaseRight}>
+                  <span className={styles.phaseTag}>{phase.tag}</span>
+                  <span className={styles.phaseChevron}>{isPhaseOpen ? "▲" : "▼"}</span>
+                </div>
+              </button>
 
-          {expandedPhase === phase.id && (
-            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
-              {phase.weeks.map(week => {
-                const key = `${phase.id}-${week.n}`
-                const isOpen = expandedWeek === key
-                return (
-                  <div key={week.n} style={{
-                    background: "#fff", borderRadius: 10, overflow: "hidden",
-                    boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-                    border: `1px solid ${phase.accent}20`
-                  }}>
-                    <div
-                      onClick={() => toggleWeek(phase.id, week.n)}
-                      style={{
-                        padding: "12px 14px", cursor: "pointer",
-                        display: "flex", justifyContent: "space-between", alignItems: "center",
-                        background: isOpen ? phase.lightBg : "#fff",
-                      }}
-                    >
-                      <div>
-                        <span style={{ fontWeight: "bold", color: "#1a1a1a", fontSize: 14 }}>Week {week.n}</span>
-                        <span style={{ marginLeft: 8, fontSize: 12, color: "#999" }}>{week.dates}</span>
-                        <div style={{ fontSize: 12, color: phase.accent, marginTop: 2 }}>📍 {week.focus}</div>
-                      </div>
-                      <span style={{ color: phase.accent, fontSize: 16, fontWeight: "bold" }}>{isOpen ? "−" : "+"}</span>
-                    </div>
+              {isPhaseOpen && (
+                <div className={styles.weeks}>
+                  {phase.weeks.map(week => {
+                    const key = `${phase.id}-${week.n}`
+                    const isOpen = expandedWeek === key
+                    return (
+                      <div key={week.n} className={styles.weekCard}>
+                        <button
+                          className={styles.weekHeader}
+                          style={isOpen ? { background: `${phase.accent}18` } : undefined}
+                          onClick={() => toggleWeek(phase.id, week.n)}
+                          aria-expanded={isOpen}
+                        >
+                          <div>
+                            <span className={styles.weekTitle}>Week {week.n}</span>
+                            <span className={styles.weekDates}>{week.dates}</span>
+                            <div className={styles.weekFocus} style={{ color: phase.accent }}>📍 {week.focus}</div>
+                          </div>
+                          <span className={styles.weekChevron} style={{ color: phase.accent }}>
+                            {isOpen ? "−" : "+"}
+                          </span>
+                        </button>
 
-                    {isOpen && (
-                      <div style={{ padding: "0 14px 12px" }}>
-                        {week.days.map((day, i) => {
-                          const d = day[scenario]
-                          const tc = typeColors[d.type] ?? { bg: "#eee", text: "#333" }
-                          return (
-                            <div key={i} style={{
-                              display: "flex", gap: 10, padding: "10px 0",
-                              borderTop: `1px solid ${i === 0 ? phase.accent + "20" : "#f0f0f0"}`,
-                              alignItems: "flex-start"
-                            }}>
-                              <div style={{ minWidth: 44 }}>
-                                <div style={{ fontSize: 11, fontWeight: "bold", color: "#888", display: "flex", alignItems: "center", gap: 3 }}>
-                                  {day.label}
-                                  {day.holiday && (
-                                    <span style={{ fontSize: 9, background: "#ffefc0", color: "#a06000", borderRadius: 3, padding: "1px 4px", fontWeight: "bold" }}>PH</span>
-                                  )}
+                        {isOpen && (
+                          <div className={styles.days}>
+                            {week.days.map((day, i) => {
+                              const d = day[scenario]
+                              const tc = typeColors[d.type] ?? { bg: "#eee", text: "#333" }
+                              return (
+                                <div key={i} className={styles.day}>
+                                  <div className={styles.dayMeta}>
+                                    <div className={styles.dayLabel}>
+                                      {day.label}
+                                      {day.holiday && <span className={styles.holidayBadge}>PH</span>}
+                                    </div>
+                                    <div className={styles.dayTiming}>{day.timing}</div>
+                                  </div>
+                                  <div className={styles.dayContent}>
+                                    <span
+                                      className={styles.activityBadge}
+                                      style={{ background: tc.bg, color: tc.text }}
+                                    >
+                                      {d.type}
+                                    </span>
+                                    <p className={styles.activityDetail}>{d.detail}</p>
+                                  </div>
                                 </div>
-                                <div style={{ fontSize: 10, color: "#bbb" }}>{day.timing}</div>
-                              </div>
-                              <div style={{ flex: 1 }}>
-                                <span style={{
-                                  display: "inline-block",
-                                  background: tc.bg, color: tc.text,
-                                  borderRadius: 4, padding: "2px 8px",
-                                  fontSize: 11, fontWeight: "bold", marginBottom: 4
-                                }}>{d.type}</span>
-                                <div style={{ fontSize: 13, color: "#444", lineHeight: 1.5 }}>{d.detail}</div>
-                              </div>
-                            </div>
-                          )
-                        })}
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                )
-              })}
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ))}
+          )
+        })}
+      </div>
 
-      {/* Race Day */}
-      <div style={{
-        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-        borderRadius: 14, padding: "20px", color: "#fff",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.2)", marginTop: 8
-      }}>
-        <div style={{ fontSize: 22, fontWeight: "bold", marginBottom: 4 }}>🏁 Race Day</div>
-        <div style={{ fontSize: 13, color: "#aaa", marginBottom: 14 }}>September 13 · 10km · Target: under 90 minutes</div>
+      <div className={styles.raceDay}>
+        <div className={styles.raceDayTitle}>🏁 Race Day</div>
+        <p className={styles.raceDaySubtitle}>September 13 · 10km · Target: under 90 minutes</p>
         {[
           "Start SLOW — first 2km should feel almost too easy",
           "Target pace: 9 min/km (or 9:30 for first half)",
@@ -657,22 +620,15 @@ export default function WorkoutPlan() {
           "Last 2km: give what you have left",
           "Goal: finish under 90 min. 15 weeks of work. Do it."
         ].map((tip, i) => (
-          <div key={i} style={{ display: "flex", gap: 10, marginBottom: 9, alignItems: "flex-start" }}>
-            <span style={{ color: "#f0a500", fontSize: 13, marginTop: 1 }}>→</span>
-            <span style={{ fontSize: 13, color: "#ddd", lineHeight: 1.5 }}>{tip}</span>
+          <div key={i} className={styles.raceTip}>
+            <span className={styles.raceTipArrow}>→</span>
+            <span className={styles.raceTipText}>{tip}</span>
           </div>
         ))}
-        <div style={{
-          marginTop: 14, padding: "12px", background: "rgba(255,255,255,0.08)",
-          borderRadius: 8, textAlign: "center", fontSize: 15, fontWeight: "bold", color: "#f0a500"
-        }}>
-          Cross that finish line. 🎉
-        </div>
+        <div className={styles.raceDayFinish}>Cross that finish line. 🎉</div>
       </div>
 
-      <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: "#bbb" }}>
-        Toggle gym scenario above · Tap phase to expand · Tap week for daily details
-      </div>
+      <p className={styles.pageHint}>Toggle gym scenario above · Tap phase to expand · Tap week for daily details</p>
     </div>
   )
 }
