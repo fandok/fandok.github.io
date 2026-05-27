@@ -7,6 +7,11 @@ const features = [
     title: 'Counter',
     description: 'A simple stateful counter.',
   },
+  {
+    path: '/workout-plan',
+    title: 'Workout Plan',
+    description: '15-week training plan for a 10km race.',
+  },
 ]
 
 function Home() {
