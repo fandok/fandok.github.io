@@ -21,7 +21,10 @@ const GYM_SCENARIOS: Record<Scenario, { label: string; icon: string; color: stri
 }
 
 type DayActivity = { type: string; detail: string }
-type Day = { label: string; timing: string; keep: DayActivity; cancel: DayActivity; holiday?: boolean }
+type Day = { label: string; timing: string; keep: DayActivity; cancel: DayActivity; holiday?: boolean; today?: boolean }
+
+// Bump this whenever the schedule is hand-adjusted.
+const LAST_UPDATED = "Jun 2, 2026"
 type Week = { n: number; dates: string; focus: string; days: Day[] }
 type Phase = { id: number; name: string; period: string; accent: string; lightBg: string; tag: string; weeks: Week[] }
 
@@ -38,14 +41,14 @@ const phases: Phase[] = [
         n: 1, dates: "Jun 1 – Jun 7", focus: "Wake up the body",
         days: [
           {
-            label: "Mon Jun 1", timing: "🌙 7pm+", holiday: true,
-            keep: { type: "Gym – Cardio", detail: "Public holiday — gym may be closed. If open: Treadmill 1 min run / 2 min walk × 8 (24 min). Otherwise do the outdoor version." },
-            cancel: { type: "Outdoor Run", detail: "Public holiday — enjoy the cooler morning. Walk/run: 1 min jog / 2 min walk × 8. 24 min total." }
+            label: "Mon Jun 1", timing: "😴 Rest", holiday: true,
+            keep: { type: "Rest", detail: "Public holiday — rested (already played padel May 30–31). Cardio moved to Tuesday." },
+            cancel: { type: "Rest", detail: "Public holiday — rested (already played padel May 30–31). Cardio moved to Tuesday." }
           },
           {
-            label: "Tue", timing: "😴 Rest",
-            keep: { type: "Rest", detail: "Full rest." },
-            cancel: { type: "Rest", detail: "Full rest." }
+            label: "Tue Jun 2", timing: "🌙 7pm+", today: true,
+            keep: { type: "Gym – Cardio", detail: "Today's session (moved from Monday). Treadmill: 1 min run / 2 min walk × 8 (24 min). Cooldown 10 min walk." },
+            cancel: { type: "Outdoor Run", detail: "Today's session (moved from Monday). Walk/run outside: 1 min jog / 2 min walk × 8. 24 min total." }
           },
           {
             label: "Wed", timing: "🌙 7pm+",
@@ -59,8 +62,8 @@ const phases: Phase[] = [
           },
           {
             label: "Fri", timing: "🌙 7pm+",
-            keep: { type: "Gym – Cardio", detail: "Same intervals as Monday. Try to feel slightly stronger." },
-            cancel: { type: "Outdoor Run", detail: "Same walk/run intervals as Monday." }
+            keep: { type: "Gym – Cardio", detail: "Same intervals as Tuesday. Try to feel slightly stronger." },
+            cancel: { type: "Outdoor Run", detail: "Same walk/run intervals as Tuesday." }
           },
           {
             label: "Sat", timing: "☀️ Morning",
@@ -606,15 +609,22 @@ export default function WorkoutPlan() {
                           const tc = typeColors[d.type] ?? { bg: "#eee", text: "#333" }
                           return (
                             <div key={i} style={{
-                              display: "flex", gap: 10, padding: "10px 0",
+                              display: "flex", gap: 10, padding: "10px",
                               borderTop: `1px solid ${i === 0 ? phase.accent + "20" : "#f0f0f0"}`,
-                              alignItems: "flex-start"
+                              alignItems: "flex-start",
+                              margin: "0 -10px",
+                              background: day.today ? "#fff6e6" : "transparent",
+                              borderLeft: day.today ? "3px solid #f0a500" : "3px solid transparent",
+                              borderRadius: day.today ? 6 : 0,
                             }}>
                               <div style={{ minWidth: 44 }}>
-                                <div style={{ fontSize: 11, fontWeight: "bold", color: "#888", display: "flex", alignItems: "center", gap: 3 }}>
+                                <div style={{ fontSize: 11, fontWeight: "bold", color: "#888", display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap" }}>
                                   {day.label}
                                   {day.holiday && (
                                     <span style={{ fontSize: 9, background: "#ffefc0", color: "#a06000", borderRadius: 3, padding: "1px 4px", fontWeight: "bold" }}>PH</span>
+                                  )}
+                                  {day.today && (
+                                    <span style={{ fontSize: 9, background: "#f0a500", color: "#fff", borderRadius: 3, padding: "1px 4px", fontWeight: "bold" }}>TODAY</span>
                                   )}
                                 </div>
                                 <div style={{ fontSize: 10, color: "#bbb" }}>{day.timing}</div>
@@ -672,6 +682,7 @@ export default function WorkoutPlan() {
 
       <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: "#bbb" }}>
         Toggle gym scenario above · Tap phase to expand · Tap week for daily details
+        <div style={{ marginTop: 6, color: "#ccc" }}>Last updated: {LAST_UPDATED}</div>
       </div>
     </div>
   )
