@@ -12,6 +12,11 @@ const features = [
     title: 'Workout Plan',
     description: '15-week training plan for a 10km race.',
   },
+  {
+    path: '/kyc',
+    title: 'Know Your Colleague',
+    description: 'Padel, games, travel, series, and family — a KYC deck.',
+  },
 ]
 
 function Home() {
