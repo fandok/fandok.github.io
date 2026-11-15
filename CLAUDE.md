@@ -25,6 +25,7 @@ No test suite configured.
 - `src/pages/` — top-level pages (`Home`, `NotFound`)
 - `src/pages/features/<name>/` — self-contained feature pages (each in their own folder)
 - CSS Modules (`.module.css`) for scoped styles on pages; inline styles for feature components
+- **Chakra UI v3** is available but scoped per page, not global: `padel-level` wraps itself in `<ChakraProvider value={padelSystem}>` (see `chakraSystem.ts`), whose CSS reset/global styles only apply inside `.padel-scope`. Never add a global `ChakraProvider` — it would restyle the other pages. Lazy-load Chakra pages in `App.tsx` (`React.lazy`) to keep Chakra out of the main bundle.
 
 **Adding a new feature page:**
 1. Create `src/pages/features/<name>/<Name>.tsx`

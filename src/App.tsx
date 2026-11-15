@@ -7,7 +7,20 @@ import Kyc from './pages/features/kyc/Kyc'
 import NotFound from './pages/NotFound'
 
 // Lazy-loaded so Chakra UI (used only on this page) stays out of the main bundle.
-const PadelLevel = lazy(() => import('./pages/features/padel-level/PadelLevel'))
+// If the chunk fails to load (e.g. a redeploy renamed it), reload once to pick up the new build.
+const PadelLevel = lazy(() =>
+  import('./pages/features/padel-level/PadelLevel').catch((err) => {
+    if (sessionStorage.getItem('chunk-reload') !== '1') {
+      sessionStorage.setItem('chunk-reload', '1')
+      window.location.reload()
+      return new Promise<never>(() => {})
+    }
+    throw err
+  }).then((mod) => {
+    sessionStorage.removeItem('chunk-reload')
+    return mod
+  }),
+)
 
 function App() {
   return (

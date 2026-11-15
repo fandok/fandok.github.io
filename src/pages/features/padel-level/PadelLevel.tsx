@@ -1,4 +1,4 @@
-import { useRef, useState, useSyncExternalStore, type Ref } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type Ref } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import {
   Badge,
@@ -16,7 +16,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { toBlob, toPng } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 import { PADEL_SCOPE_CLASS, padelSystem } from './chakraSystem'
 
 // ─── Data ───────────────────────────────────────────────────────────────────
@@ -281,8 +281,21 @@ function loadDraft(): Draft | null {
 
 function loadLast(): Assessment | null {
   const a = readJson(LAST_KEY) as Partial<Assessment> | null
-  if (!a || typeof a !== 'object' || typeof a.completedAt !== 'string') return null
+  if (!a || typeof a !== 'object' || typeof a.completedAt !== 'string' || Number.isNaN(Date.parse(a.completedAt)))
+    return null
   return { name: typeof a.name === 'string' ? a.name : '', ticked: cleanTicked(a.ticked), completedAt: a.completedAt }
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  // Revoke later: revoking right away can cancel the download in some browsers.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 
 // ─── Dark mode (follows the OS, like the rest of the site) ─────────────────
@@ -312,6 +325,7 @@ export default function PadelLevel() {
   }
 
   const startNew = () => {
+    if (draft && !window.confirm('Discard your unfinished assessment and start over?')) return
     updateDraft({ name: last?.name ?? '', ticked: [], step: 0, updatedAt: new Date().toISOString() })
     setView('form')
     window.scrollTo(0, 0)
@@ -428,12 +442,7 @@ function Intro({
             <Button colorPalette="orange" onClick={onResume}>
               Continue draft
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (window.confirm('Discard your unfinished assessment and start over?')) onStart()
-              }}
-            >
+            <Button variant="outline" onClick={onStart}>
               Start over
             </Button>
           </HStack>
@@ -665,16 +674,27 @@ function ResultView({
   // corners show up black in some viewers (e.g. WhatsApp).
   const renderOptions = { pixelRatio: 2, cacheBust: true, style: { borderRadius: '0', margin: '0' } }
 
-  const saveImage = async () => {
+  // Render the card image as soon as the result shows, so that tapping Share calls
+  // navigator.share while the tap still counts as a user gesture (iOS Safari
+  // rejects shares that start after a slow await).
+  const blobRef = useRef<Promise<Blob | null> | null>(null)
+  useEffect(() => {
     if (!cardRef.current) return
+    const pending = toBlob(cardRef.current, renderOptions)
+    pending.catch(() => {}) // handled where it's awaited
+    blobRef.current = pending
+    // renderOptions is constant; re-render only when the assessment changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assessment])
+  const getBlob = () => blobRef.current ?? (cardRef.current ? toBlob(cardRef.current, renderOptions) : Promise.resolve(null))
+
+  const saveImage = async () => {
     setBusy('save')
     setMessage(null)
     try {
-      const dataUrl = await toPng(cardRef.current, renderOptions)
-      const a = document.createElement('a')
-      a.href = dataUrl
-      a.download = fileName
-      a.click()
+      const blob = await getBlob()
+      if (!blob) throw new Error('no image')
+      downloadBlob(blob, fileName)
       setMessage('Image saved. Share it from your gallery or downloads.')
     } catch {
       setMessage("Couldn't create the image. Try taking a screenshot instead.")
@@ -684,23 +704,17 @@ function ResultView({
   }
 
   const shareImage = async () => {
-    if (!cardRef.current) return
     setBusy('share')
     setMessage(null)
     try {
-      const blob = await toBlob(cardRef.current, renderOptions)
+      const blob = await getBlob()
       if (!blob) throw new Error('no image')
       const file = new File([blob], fileName, { type: 'image/png' })
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], text: shareText })
       } else {
         // Desktop browsers usually can't share files: fall back to downloading.
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = fileName
-        a.click()
-        URL.revokeObjectURL(url)
+        downloadBlob(blob, fileName)
         setMessage("Your browser can't share images directly, so the image was downloaded instead.")
       }
     } catch (err) {
@@ -743,29 +757,26 @@ function ResultView({
         </Heading>
         <Text>{band.description}</Text>
 
-        {result.capped && (
-          <Box borderWidth="1px" borderColor="red.muted" bg="red.subtle" rounded="xl" p={4}>
-            <Text fontWeight="semibold" color="red.fg">
-              🚩 Capped at {formatLevel(ANCHOR_CAP)} by red flags
+        {redFlags.length > 0 && (
+          <Box
+            borderWidth="1px"
+            borderColor={result.capped ? 'red.muted' : 'orange.muted'}
+            bg={result.capped ? 'red.subtle' : 'orange.subtle'}
+            rounded="xl"
+            p={4}
+          >
+            <Text fontWeight="semibold" color={result.capped ? 'red.fg' : undefined}>
+              {result.capped
+                ? `🚩 Capped at ${formatLevel(ANCHOR_CAP)} by red flags`
+                : `🚩 Habits to fix before moving past ${formatLevel(ANCHOR_CAP)}`}
             </Text>
-            <Text fontSize="sm" mb={2}>
-              Your skills alone score level <b>{formatLevel(result.rawLevel)}</b>, but these habits hold you back. Fix
-              them first:
-            </Text>
-            <Stack gap={1} fontSize="sm">
-              {redFlags.map(({ cat, item }) => (
-                <Text key={item.id}>
-                  • {item.text} <Text as="span" color="fg.muted">({cat.name})</Text>
-                </Text>
-              ))}
-            </Stack>
-          </Box>
-        )}
-
-        {!result.capped && redFlags.length > 0 && (
-          <Box borderWidth="1px" borderColor="orange.muted" bg="orange.subtle" rounded="xl" p={4}>
-            <Text fontWeight="semibold">🚩 Habits to fix before moving past {formatLevel(ANCHOR_CAP)}</Text>
-            <Stack gap={1} fontSize="sm" mt={1}>
+            {result.capped && (
+              <Text fontSize="sm">
+                Your skills alone score level <b>{formatLevel(result.rawLevel)}</b>, but these habits hold you back.
+                Fix them first:
+              </Text>
+            )}
+            <Stack gap={1} fontSize="sm" mt={2}>
               {redFlags.map(({ cat, item }) => (
                 <Text key={item.id}>
                   • {item.text} <Text as="span" color="fg.muted">({cat.name})</Text>
@@ -776,11 +787,13 @@ function ResultView({
         )}
 
         <Stack gap={3}>
-          <SummaryRow
-            label="💪 Strongest area"
-            text={`${categoryById(strongest.id).name}: ${strongest.score}/${strongest.max} skills.`}
-          />
-          {weakest.id !== strongest.id && (
+          {strongest.score > 0 && (
+            <SummaryRow
+              label="💪 Strongest area"
+              text={`${categoryById(strongest.id).name}: ${strongest.score}/${strongest.max} skills.`}
+            />
+          )}
+          {(weakest.id !== strongest.id || strongest.score === 0) && (
             <SummaryRow
               label="🎯 Focus area"
               text={`${categoryById(weakest.id).name}: ${weakest.score}/${weakest.max} skills.`}
