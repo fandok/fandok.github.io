@@ -1188,7 +1188,7 @@ function ChecklistGroup({
                   size="xs"
                   rounded="full"
                   variant={open ? 'solid' : 'subtle'}
-                  colorPalette="gray"
+                  colorPalette={open ? 'green' : 'gray'}
                   mt={1}
                   onClick={() => setOpenId(open ? null : item.id)}
                 >
