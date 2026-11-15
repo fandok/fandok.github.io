@@ -17,6 +17,11 @@ const features = [
     title: 'Know Your Colleague',
     description: 'Padel, games, travel, series, and family — a KYC deck.',
   },
+  {
+    path: '/padel-level',
+    title: 'Padel Level Check',
+    description: 'Self-assess your padel level (1.0–5.5) and share the result.',
+  },
 ]
 
 function Home() {
