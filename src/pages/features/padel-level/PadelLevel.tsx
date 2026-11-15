@@ -428,7 +428,12 @@ function Intro({
             <Button colorPalette="orange" onClick={onResume}>
               Continue draft
             </Button>
-            <Button variant="outline" onClick={onStart}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (window.confirm('Discard your unfinished assessment and start over?')) onStart()
+              }}
+            >
               Start over
             </Button>
           </HStack>
@@ -656,7 +661,9 @@ function ResultView({
   const fileName = `padel-level-${formatLevel(result.level)}.png`
   const shareText = `My padel level: ${formatLevel(result.level)} (${band.title}) · ${result.total}/${MAX_SCORE}. Check yours: ${window.location.origin}/padel-level`
 
-  const renderOptions = { pixelRatio: 2, cacheBust: true }
+  // Square corners and no outer margin in the exported image: transparent rounded
+  // corners show up black in some viewers (e.g. WhatsApp).
+  const renderOptions = { pixelRatio: 2, cacheBust: true, style: { borderRadius: '0', margin: '0' } }
 
   const saveImage = async () => {
     if (!cardRef.current) return
