@@ -55,7 +55,8 @@ type TermId =
   | 'lunge'
   | 'backpedal'
 
-const GLOSSARY: Record<TermId, { name: string; def: L }> = {
+// `nameId` is set where Indonesian players usually use a local word.
+const GLOSSARY: Record<TermId, { name: string; nameId?: string; def: L }> = {
   bandeja: {
     name: 'Bandeja',
     def: {
@@ -107,6 +108,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   'back-glass': {
     name: 'Back glass',
+    nameId: 'Kaca belakang (back glass)',
     def: {
       en: 'The glass wall behind you. In padel the ball may bounce on the floor, then off this wall, and still be played.',
       id: 'Dinding kaca di belakangmu. Di padel, bola boleh memantul di lantai lalu ke dinding ini dan tetap bisa dimainkan.',
@@ -114,6 +116,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   'side-glass': {
     name: 'Side glass',
+    nameId: 'Kaca samping (side glass)',
     def: {
       en: 'The glass walls at the sides of the court. The ball comes off them at an angle, so you need to read the rebound.',
       id: 'Dinding kaca di sisi lapangan. Bola memantul keluar dengan sudut, jadi kamu perlu membaca arah pantulannya.',
@@ -128,6 +131,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   rotate: {
     name: 'Rotate (with the wall)',
+    nameId: 'Berputar (rotate)',
     def: {
       en: 'Turning your body sideways and stepping with the ball as it comes off the glass, so you can hit it while facing the net.',
       id: 'Memutar badan menyamping dan melangkah mengikuti bola yang keluar dari kaca, agar bisa memukul sambil menghadap net.',
@@ -177,6 +181,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   'high-to-low': {
     name: 'High to low',
+    nameId: 'Dari atas ke bawah (high to low)',
     def: {
       en: 'Swinging from above the ball downwards (on serves and volleys), so the ball travels down and stays low after the bounce.',
       id: 'Mengayun dari atas bola ke bawah (saat servis dan volley), sehingga bola bergerak turun dan tetap rendah setelah memantul.',
@@ -184,6 +189,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   'low-to-high': {
     name: 'Low to high',
+    nameId: 'Dari bawah ke atas (low to high)',
     def: {
       en: 'Swinging from below the ball upwards on groundstrokes, for a flatter, more controlled ball over the net.',
       id: 'Ayunan dari bawah ke atas pada groundstroke, agar bola melewati net lebih datar dan terkontrol.',
@@ -212,6 +218,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   'ready-position': {
     name: 'Ready position',
+    nameId: 'Posisi siap (ready position)',
     def: {
       en: 'Knees bent, weight on the balls of your feet, racket up in front of you, ready to move either way.',
       id: 'Lutut ditekuk, berat badan di ujung telapak kaki, raket di depan badan, siap bergerak ke arah mana pun.',
@@ -219,6 +226,7 @@ const GLOSSARY: Record<TermId, { name: string; def: L }> = {
   },
   shuffle: {
     name: 'Shuffle / side steps',
+    nameId: 'Shuffle / langkah samping',
     def: {
       en: 'Moving sideways without crossing your feet, so you stay balanced and facing the play.',
       id: 'Bergerak menyamping tanpa menyilangkan kaki, agar tetap seimbang dan menghadap permainan.',
@@ -500,7 +508,7 @@ const ALL_ITEM_IDS = new Set(CATEGORIES.flatMap((c) => [...c.anchors, ...c.posit
 
 // ─── UI text ────────────────────────────────────────────────────────────────
 
-const s = (n: number) => (n === 1 ? '' : 's')
+const plural = (n: number) => (n === 1 ? '' : 's')
 
 const UI_EN = {
   title: "What's my padel level?",
@@ -508,7 +516,7 @@ const UI_EN = {
     "A quick self-assessment based on a coach's levelling score sheet. Tick what's true about your game across tactics, technique, movement and wall skills, and get a level from 1.0 to 5.5 you can share with your padel group.",
   draftTitle: 'You have an unfinished assessment',
   draftMeta: (date: string, step: number, steps: number, ticked: number) =>
-    `Saved ${date} · step ${step} of ${steps} · ${ticked} item${s(ticked)} ticked`,
+    `Saved ${date} · step ${step} of ${steps} · ${ticked} item${plural(ticked)} ticked`,
   continueDraft: 'Continue draft',
   startOver: 'Start over',
   confirmDiscard: 'Discard your unfinished assessment and start over?',
@@ -534,7 +542,7 @@ const UI_EN = {
   back: '← Back',
   next: (name: string) => `Next: ${name} →`,
   seeLevel: 'See my level →',
-  termsButton: 'What do these terms mean?',
+  termsButton: 'What does this mean:',
   glossaryTitle: '📖 Padel glossary',
   glossaryHide: 'Hide glossary',
   shareImage: 'Share image',
@@ -554,8 +562,8 @@ const UI_EN = {
   nextLevel: '📈 Next level',
   skillsOf: (score: number, max: number) => `${score}/${max} skills.`,
   nextCapped: (raw: string, pts: number, next: string) =>
-    `Clear your red flags to unlock ${raw}; ${pts} more skill${s(pts)} would take you to ${next}.`,
-  nextNormal: (pts: number, next: string) => `${pts} more skill${s(pts)} to reach level ${next}.`,
+    `Clear your red flags to unlock ${raw}; ${pts} more skill${plural(pts)} would take you to ${next}.`,
+  nextNormal: (pts: number, next: string) => `${pts} more skill${plural(pts)} to reach level ${next}.`,
   workOn: (cat: string) => `Skills to work on next (${cat})`,
   disclaimer:
     'This is a self-assessment, not an official rating. For an accurate level, ask a coach to fill the same sheet while watching you play.',
@@ -604,7 +612,7 @@ const UI: Record<Lang, UiText> = {
     back: '← Kembali',
     next: (name) => `Lanjut: ${name} →`,
     seeLevel: 'Lihat levelku →',
-    termsButton: 'Apa arti istilah ini?',
+    termsButton: 'Apa artinya:',
     glossaryTitle: '📖 Glosarium padel',
     glossaryHide: 'Tutup glosarium',
     shareImage: 'Bagikan gambar',
@@ -695,7 +703,7 @@ function formatLevel(level: number) {
 }
 
 function formatDate(iso: string, lang: Lang) {
-  return new Date(iso).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-GB', {
+  return new Date(iso).toLocaleDateString(lang === 'id' ? 'id-ID' : 'en', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -991,27 +999,28 @@ function Intro({
 
 // ─── Glossary ───────────────────────────────────────────────────────────────
 
-function TermDefinitions({ terms }: { terms: TermId[] }) {
+const termName = (id: TermId, lang: Lang) => (lang === 'id' && GLOSSARY[id].nameId) || GLOSSARY[id].name
+
+function TermDefinitions({ terms, id }: { terms: TermId[]; id?: string }) {
   const { lang } = useLang()
   return (
-    <Stack gap={2} bg="bg.muted" rounded="md" p={3} fontSize="sm">
-      {terms.map((id) => (
-        <Box key={id}>
-          <Text fontWeight="semibold">{GLOSSARY[id].name}</Text>
-          <Text color="fg.muted">{GLOSSARY[id].def[lang]}</Text>
+    <Stack id={id} gap={2} bg="bg.muted" rounded="md" p={3} fontSize="sm">
+      {terms.map((term) => (
+        <Box key={term}>
+          <Text fontWeight="semibold">{termName(term, lang)}</Text>
+          <Text color="fg.muted">{GLOSSARY[term].def[lang]}</Text>
         </Box>
       ))}
     </Stack>
   )
 }
 
-const ALL_TERMS = (Object.keys(GLOSSARY) as TermId[]).sort((a, b) =>
-  GLOSSARY[a].name.localeCompare(GLOSSARY[b].name),
-)
+const ALL_TERMS = Object.keys(GLOSSARY) as TermId[]
 
 function Glossary() {
-  const { t } = useLang()
+  const { lang, t } = useLang()
   const [open, setOpen] = useState(false)
+  const sorted = [...ALL_TERMS].sort((a, b) => termName(a, lang).localeCompare(termName(b, lang), lang))
   return (
     <Stack gap={3}>
       <Button
@@ -1023,7 +1032,7 @@ function Glossary() {
       >
         {open ? t.glossaryHide : `${t.glossaryTitle} (${ALL_TERMS.length})`}
       </Button>
-      {open && <TermDefinitions terms={ALL_TERMS} />}
+      {open && <TermDefinitions terms={sorted} />}
     </Stack>
   )
 }
@@ -1182,14 +1191,13 @@ function ChecklistGroup({
               </Checkbox.Root>
               {item.terms && (
                 <IconButton
-                  aria-label={t.termsButton}
-                  title={t.termsButton}
+                  aria-label={`${t.termsButton} ${item.terms.map((term) => termName(term, lang)).join(', ')}`}
                   aria-expanded={open}
-                  size="xs"
+                  aria-controls={`defs-${item.id}`}
+                  size="sm"
                   rounded="full"
                   variant={open ? 'solid' : 'subtle'}
                   colorPalette={open ? 'green' : 'gray'}
-                  mt={1}
                   onClick={() => setOpenId(open ? null : item.id)}
                 >
                   ?
@@ -1198,7 +1206,7 @@ function ChecklistGroup({
             </Flex>
             {open && item.terms && (
               <Box pl={6} pb={2}>
-                <TermDefinitions terms={item.terms} />
+                <TermDefinitions id={`defs-${item.id}`} terms={item.terms} />
               </Box>
             )}
           </Box>
