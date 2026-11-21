@@ -22,6 +22,11 @@ const features = [
     title: 'Padel Level Check',
     description: 'Self-assess your padel level (1.0–5.5) and share the result.',
   },
+  {
+    path: '/lomba-sihir',
+    title: 'Lomba Sihir Setlist',
+    description: 'Likely concert setlist with your own lyrics, saved for offline.',
+  },
 ]
 
 function Home() {
