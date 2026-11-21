@@ -2,6 +2,7 @@
 // Navigations: network first (short timeout), fall back to the cached page.
 // Hashed build assets: cache first.
 const CACHE = 'lomba-sihir-v1'
+const MATCH = { ignoreVary: true } // hosts may send "Vary: Origin"; hashed assets never change
 const PAGE = '/lomba-sihir'
 
 // The SPA is served via 404.html on GitHub Pages, so a 404 HTML response is still the app.
@@ -14,7 +15,7 @@ async function cachePageAndAssets(res) {
   await cache.put(PAGE, new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } }))
   const urls = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+|\/favicon\.svg)"/g)].map((m) => m[1])
   await Promise.all(urls.map(async (u) => {
-    if (await cache.match(u)) return
+    if (await cache.match(u, MATCH)) return
     const r = await fetch(u)
     if (r.ok) await cache.put(u, r)
   }))
@@ -57,7 +58,7 @@ self.addEventListener('fetch', (event) => {
         // Bad signal at a venue: don't wait forever before showing the cached copy.
         return await Promise.race([net, timeout(4000)])
       } catch {
-        const cached = await caches.match(PAGE)
+        const cached = await caches.match(PAGE, MATCH)
         return cached || net
       }
     })())
@@ -66,7 +67,7 @@ self.addEventListener('fetch', (event) => {
 
   if (url.pathname.startsWith('/assets/') || url.pathname === '/favicon.svg') {
     event.respondWith((async () => {
-      const cached = await caches.match(req)
+      const cached = await caches.match(req, MATCH)
       if (cached) return cached
       const res = await fetch(req)
       if (res.ok) {
