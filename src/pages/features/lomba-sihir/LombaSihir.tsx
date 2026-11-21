@@ -56,20 +56,39 @@ const KEY_PLAYED = 'lomba-sihir:played'
 const KEY_SIZE = 'lomba-sihir:size'
 const SIZES = [16, 19, 23, 28]
 
-function load<T>(key: string, fallback: T): T {
+function loadRaw(key: string): unknown {
   try {
     const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
+    return raw ? JSON.parse(raw) : undefined
   } catch {
-    return fallback
+    return undefined
   }
 }
 
-function save(key: string, value: unknown) {
+// Stored values are re-validated: a bad value must never white-screen the page at the venue.
+function loadLyrics(): Record<string, string> {
+  const v = loadRaw(KEY_LYRICS)
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  return Object.fromEntries(Object.entries(v).filter(([, t]) => typeof t === 'string'))
+}
+
+function loadPlayed(): string[] {
+  const v = loadRaw(KEY_PLAYED)
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
+}
+
+function loadSize(): number {
+  const v = loadRaw(KEY_SIZE)
+  return typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < SIZES.length ? v : 1
+}
+
+/** Returns false when the browser refused to store (private mode, full quota). */
+function save(key: string, value: unknown): boolean {
   try {
     localStorage.setItem(key, JSON.stringify(value))
+    return true
   } catch {
-    // Storage full or blocked: the page still works for this visit.
+    return false
   }
 }
 
@@ -87,10 +106,20 @@ function useOfflineReady() {
   useEffect(() => {
     if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return
     let alive = true
+    const markReady = () => { if (alive) setReady(true) }
+    // Ask the browser not to evict the cache and saved lyrics before the show.
+    navigator.storage?.persist?.().catch(() => {})
+    // Readiness comes from the registration itself, not navigator.serviceWorker.ready:
+    // when the user arrives from the home page, this document started outside the worker's scope.
     navigator.serviceWorker
       .register('/lomba-sihir-sw.js', { scope: '/lomba-sihir' })
-      .then(() => navigator.serviceWorker.ready)
-      .then(() => { if (alive) setReady(true) })
+      .then((reg) => {
+        if (reg.active) return markReady()
+        const sw = reg.installing ?? reg.waiting
+        sw?.addEventListener('statechange', () => {
+          if (sw.state === 'activated') markReady()
+        })
+      })
       .catch(() => {})
     return () => { alive = false }
   }, [])
@@ -201,31 +230,32 @@ function SongCard({ song, index, open, played, lyrics, online, onToggle, onPlaye
 function LombaSihir() {
   const online = useSyncExternalStore(subscribeOnline, () => navigator.onLine, () => true)
   const offlineReady = useOfflineReady()
-  const [lyrics, setLyrics] = useState<Record<string, string>>(() => load(KEY_LYRICS, {}))
-  const [played, setPlayed] = useState<string[]>(() => load(KEY_PLAYED, []))
-  const [sizeIdx, setSizeIdx] = useState<number>(() => {
-    const n = load(KEY_SIZE, 1)
-    return n >= 0 && n < SIZES.length ? n : 1
-  })
+  const [lyrics, setLyrics] = useState(loadLyrics)
+  const [played, setPlayed] = useState(loadPlayed)
+  const [sizeIdx, setSizeIdx] = useState(loadSize)
   const [openId, setOpenId] = useState<string | null>(null)
+  const [storageFailed, setStorageFailed] = useState(false)
 
+  // Each write starts from what is stored now, so another open tab's changes are not overwritten.
   const saveLyrics = (id: string, text: string) => {
-    const next = { ...lyrics }
+    const next = loadLyrics()
     if (text) next[id] = text
     else delete next[id]
     setLyrics(next)
-    save(KEY_LYRICS, next)
+    setStorageFailed(!save(KEY_LYRICS, next))
   }
 
   const togglePlayed = (id: string) => {
-    const next = played.includes(id) ? played.filter((p) => p !== id) : [...played, id]
+    const current = loadPlayed()
+    const next = current.includes(id) ? current.filter((p) => p !== id) : [...current, id]
     setPlayed(next)
-    save(KEY_PLAYED, next)
+    setStorageFailed(!save(KEY_PLAYED, next))
   }
 
   const resetPlayed = () => {
+    if (!window.confirm('Clear all "played" marks?')) return
     setPlayed([])
-    save(KEY_PLAYED, [])
+    setStorageFailed(!save(KEY_PLAYED, []))
   }
 
   const changeSize = (delta: number) => {
@@ -278,8 +308,16 @@ function LombaSihir() {
 
       <section className={styles.tips}>
         <strong>Before you go:</strong> open this page once while you have internet, then paste lyrics for the songs you
-        want. Everything is saved on this phone, so it works with bad or no signal at the venue.
+        want. Everything is saved on this phone, so it works with bad or no signal at the venue. Tip: add it to your
+        home screen so the browser keeps it.
       </section>
+
+      {storageFailed && (
+        <p className={styles.warn} role="alert">
+          This browser would not save to the phone (private mode or full storage?). Your changes will be lost on
+          reload. Try a normal browser tab.
+        </p>
+      )}
 
       <div className={styles.toolbar}>
         <span className={styles.progress}>

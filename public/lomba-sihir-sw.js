@@ -2,29 +2,45 @@
 // Navigations: network first (short timeout), fall back to the cached page.
 // Hashed build assets: cache first.
 const CACHE = 'lomba-sihir-v1'
-const MATCH = { ignoreVary: true } // hosts may send "Vary: Origin"; hashed assets never change
 const PAGE = '/lomba-sihir'
+const MATCH = { ignoreVary: true } // hosts may send "Vary: Origin"; hashed assets never change
 
-// The SPA is served via 404.html on GitHub Pages, so a 404 HTML response is still the app.
-const isAppHtml = (res) =>
-  (res.ok || res.status === 404) && (res.headers.get('content-type') || '').includes('text/html')
-
-async function cachePageAndAssets(res) {
-  const cache = await caches.open(CACHE)
+// The SPA is served via 404.html on GitHub Pages, so a 404 is still the app if it is our HTML.
+// Checking for the root div filters out captive-portal and error pages.
+async function appHtml(res) {
+  if (!(res.ok || res.status === 404)) return null
+  if (!(res.headers.get('content-type') || '').includes('text/html')) return null
   const html = await res.clone().text()
-  await cache.put(PAGE, new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } }))
+  return html.includes('id="root"') ? html : null
+}
+
+async function cachePageAndAssets(html) {
+  const cache = await caches.open(CACHE)
   const urls = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+|\/favicon\.svg)"/g)].map((m) => m[1])
+  // Cache every asset first; only then swap the page, so the cached page never points at missing files.
   await Promise.all(urls.map(async (u) => {
     if (await cache.match(u, MATCH)) return
     const r = await fetch(u)
-    if (r.ok) await cache.put(u, r)
+    if (!r.ok) throw new Error(`asset ${u} ${r.status}`)
+    await cache.put(u, r)
   }))
+  await cache.put(PAGE, new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } }))
+  // Drop assets from older builds.
+  const keep = new Set(urls.map((u) => new URL(u, self.location.origin).href))
+  for (const req of await cache.keys()) {
+    if (new URL(req.url).pathname.startsWith('/assets/') && !keep.has(req.url)) await cache.delete(req)
+  }
+}
+
+async function refresh(res) {
+  const html = await appHtml(res)
+  if (html) await cachePageAndAssets(html)
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     fetch(PAGE, { cache: 'no-store' })
-      .then((res) => { if (isAppHtml(res)) return cachePageAndAssets(res) })
+      .then(refresh)
       .then(() => self.skipWaiting()),
   )
 })
@@ -52,14 +68,16 @@ self.addEventListener('fetch', (event) => {
     // Clone before the page consumes the body (this reaction is registered first, so it runs first).
     const copy = net.then((res) => res.clone())
     // Refresh the offline copy whenever the network answers, even if it was too slow to use.
-    event.waitUntil(copy.then((res) => { if (isAppHtml(res)) return cachePageAndAssets(res) }).catch(() => {}))
+    event.waitUntil(copy.then(refresh).catch(() => {}))
     event.respondWith((async () => {
+      const cached = () => caches.match(PAGE, MATCH)
       try {
         // Bad signal at a venue: don't wait forever before showing the cached copy.
-        return await Promise.race([net, timeout(4000)])
+        const res = await Promise.race([net, timeout(4000)])
+        if (await appHtml(res)) return res
+        return (await cached()) || res
       } catch {
-        const cached = await caches.match(PAGE, MATCH)
-        return cached || net
+        return (await cached()) || net
       }
     })())
     return
