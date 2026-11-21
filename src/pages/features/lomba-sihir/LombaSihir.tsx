@@ -237,8 +237,9 @@ function LombaSihir() {
   const [storageFailed, setStorageFailed] = useState(false)
 
   // Each write starts from what is stored now, so another open tab's changes are not overwritten.
+  // If storage is failing, fall back to this tab's state so earlier edits don't vanish on screen.
   const saveLyrics = (id: string, text: string) => {
-    const next = loadLyrics()
+    const next = storageFailed ? { ...lyrics } : loadLyrics()
     if (text) next[id] = text
     else delete next[id]
     setLyrics(next)
@@ -246,7 +247,7 @@ function LombaSihir() {
   }
 
   const togglePlayed = (id: string) => {
-    const current = loadPlayed()
+    const current = storageFailed ? played : loadPlayed()
     const next = current.includes(id) ? current.filter((p) => p !== id) : [...current, id]
     setPlayed(next)
     setStorageFailed(!save(KEY_PLAYED, next))
