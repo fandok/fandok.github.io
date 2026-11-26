@@ -4,6 +4,8 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
@@ -391,11 +393,6 @@ const players: Player[] = [
 
 const TEAMS = [...new Set(players.map((p) => p.team))].sort((a, b) => a.localeCompare(b))
 
-const STATUS_COUNTS = STATUSES.reduce(
-  (acc, s) => ({ ...acc, [s]: players.filter((p) => p.status === s).length }),
-  {} as Record<Status, number>,
-)
-
 const STATUS_CLASS: Record<Status, string> = {
   Confirmed: styles.confirmed,
   Likely: styles.likely,
@@ -476,6 +473,13 @@ function Profiles({ player }: { player: Player }) {
   )
 }
 
+const MOBILE_SORTS = [
+  { value: '', label: 'Sort: team order' },
+  { value: 'status:asc', label: 'Sort: best match first' },
+  { value: 'status:desc', label: 'Sort: weakest match first' },
+  { value: 'player:asc', label: 'Sort: player A–Z' },
+]
+
 const MOBILE_QUERY = '(max-width: 720px)'
 
 function subscribeMobile(onChange: () => void) {
@@ -509,6 +513,9 @@ function SeaKickoffRosters() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    // Facets = rows matching every filter except the column's own, used for the chip counts.
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
   const statusCol = table.getColumn('status')!
@@ -517,6 +524,8 @@ function SeaKickoffRosters() {
   const selectedStatuses = (statusCol.getFilterValue() as Status[] | undefined) ?? []
   const rows = table.getRowModel().rows
   const filtered = search !== '' || columnFilters.length > 0
+  const statusCounts = statusCol.getFacetedUniqueValues()
+  const mobileSort = sorting.length === 1 ? `${sorting[0].id}:${sorting[0].desc ? 'desc' : 'asc'}` : ''
 
   const toggleStatus = (s: Status) => {
     const next = selectedStatuses.includes(s)
@@ -571,7 +580,7 @@ function SeaKickoffRosters() {
               title={STATUS_HINT[s]}
               onClick={() => toggleStatus(s)}
             >
-              {s} <span className={styles.count}>{STATUS_COUNTS[s]}</span>
+              {s} <span className={styles.count}>{statusCounts.get(s) ?? 0}</span>
             </button>
           ))}
         </div>
@@ -600,17 +609,23 @@ function SeaKickoffRosters() {
           </select>
           {isMobile && (
             <select
-              value={sorting[0] ? `${sorting[0].id}:${sorting[0].desc ? 'desc' : 'asc'}` : ''}
+              value={MOBILE_SORTS.some((o) => o.value === mobileSort) ? mobileSort : 'custom'}
               onChange={(e) => {
                 const [id, dir] = e.target.value.split(':')
                 setSorting(id ? [{ id, desc: dir === 'desc' }] : [])
               }}
               aria-label="Sort by"
             >
-              <option value="">Sort: team order</option>
-              <option value="status:asc">Sort: best match first</option>
-              <option value="status:desc">Sort: weakest match first</option>
-              <option value="player:asc">Sort: player A–Z</option>
+              {MOBILE_SORTS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+              {!MOBILE_SORTS.some((o) => o.value === mobileSort) && (
+                <option value="custom" disabled>
+                  Sort: custom (set on a wider screen)
+                </option>
+              )}
             </select>
           )}
         </div>
