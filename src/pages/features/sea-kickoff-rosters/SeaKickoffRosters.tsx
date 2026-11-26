@@ -1,5 +1,4 @@
-import { useState, useSyncExternalStore } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import {
   createColumnHelper,
   flexRender,
@@ -473,6 +472,8 @@ function Profiles({ player }: { player: Player }) {
   )
 }
 
+const PAGE_TITLE = 'Valorant Indo Roster List'
+
 const MOBILE_SORTS = [
   { value: '', label: 'Sort: team order' },
   { value: 'status:asc', label: 'Sort: best match first' },
@@ -497,6 +498,15 @@ function SeaKickoffRosters() {
   // memoize safely (sort/filter clicks would show stale rows), so opt this component out.
   'use no memo'
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    const previous = document.title
+    document.title = PAGE_TITLE
+    return () => {
+      document.title = previous
+    }
+  }, [])
+
   const [search, setSearch] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -542,13 +552,9 @@ function SeaKickoffRosters() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.back}>
-        <Link to="/">← Back</Link>
-      </div>
-
       <header className={styles.header}>
-        <p className={styles.label}>Valorant · SEA Kickoff · Indonesia</p>
-        <h1 className={styles.title}>Roster Cross-check</h1>
+        <p className={styles.label}>SEA Kickoff</p>
+        <h1 className={styles.title}>{PAGE_TITLE}</h1>
         <p className={styles.subtitle}>
           {players.length} registered Riot IDs across {TEAMS.length} teams, matched against vlr.gg
           and Liquipedia.
@@ -710,6 +716,7 @@ function SeaKickoffRosters() {
           </table>
         </div>
       )}
+      <footer className={styles.footer}>© {new Date().getFullYear()} fandok</footer>
     </main>
   )
 }
