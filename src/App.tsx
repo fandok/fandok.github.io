@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, type ComponentType } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Counter from './pages/features/counter/Counter'
@@ -8,20 +8,28 @@ import Kyc from './pages/features/kyc/Kyc'
 import LombaSihir from './pages/features/lomba-sihir/LombaSihir'
 import NotFound from './pages/NotFound'
 
+// If a lazy chunk fails to load (e.g. a redeploy renamed it), reload once to pick up the new build.
+function lazyWithReload<T extends ComponentType>(load: () => Promise<{ default: T }>) {
+  return lazy(() =>
+    load().catch((err) => {
+      if (sessionStorage.getItem('chunk-reload') !== '1') {
+        sessionStorage.setItem('chunk-reload', '1')
+        window.location.reload()
+        return new Promise<never>(() => {})
+      }
+      throw err
+    }).then((mod) => {
+      sessionStorage.removeItem('chunk-reload')
+      return mod
+    }),
+  )
+}
+
 // Lazy-loaded so Chakra UI (used only on this page) stays out of the main bundle.
-// If the chunk fails to load (e.g. a redeploy renamed it), reload once to pick up the new build.
-const PadelLevel = lazy(() =>
-  import('./pages/features/padel-level/PadelLevel').catch((err) => {
-    if (sessionStorage.getItem('chunk-reload') !== '1') {
-      sessionStorage.setItem('chunk-reload', '1')
-      window.location.reload()
-      return new Promise<never>(() => {})
-    }
-    throw err
-  }).then((mod) => {
-    sessionStorage.removeItem('chunk-reload')
-    return mod
-  }),
+const PadelLevel = lazyWithReload(() => import('./pages/features/padel-level/PadelLevel'))
+// Lazy-loaded so TanStack Table and the roster data stay out of the main bundle.
+const SeaKickoffRosters = lazyWithReload(
+  () => import('./pages/features/sea-kickoff-rosters/SeaKickoffRosters'),
 )
 
 function App() {
@@ -33,6 +41,7 @@ function App() {
       <Route path="/kyc" element={<Kyc />} />
       <Route path="/lomba-sihir" element={<LombaSihir />} />
       <Route path="/padel-level" element={<Suspense fallback={null}><PadelLevel /></Suspense>} />
+      <Route path="/sea-kickoff-rosters" element={<Suspense fallback={null}><SeaKickoffRosters /></Suspense>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

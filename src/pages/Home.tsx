@@ -27,6 +27,11 @@ const features = [
     title: 'Lomba Sihir Setlist',
     description: 'Likely concert setlist with your own lyrics, saved for offline.',
   },
+  {
+    path: '/sea-kickoff-rosters',
+    title: 'SEA Kickoff ID Rosters',
+    description: 'Indonesian Valorant Riot IDs cross-checked against vlr.gg and Liquipedia.',
+  },
 ]
 
 function Home() {
