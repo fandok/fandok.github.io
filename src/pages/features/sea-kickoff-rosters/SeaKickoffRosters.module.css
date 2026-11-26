@@ -32,21 +32,6 @@
   }
 }
 
-.back {
-  margin-bottom: 16px;
-}
-
-.back a {
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.back a:hover {
-  opacity: 1;
-}
-
 .header {
   text-align: center;
   margin-bottom: 24px;
@@ -294,6 +279,15 @@
 .col_notes {
   font-size: 13px;
   min-width: 200px;
+}
+
+.footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 /* Mobile cards */

@@ -29,7 +29,7 @@ const features = [
   },
   {
     path: '/sea-kickoff-rosters',
-    title: 'SEA Kickoff ID Rosters',
+    title: 'Valorant Indo Roster List',
     description: 'Indonesian Valorant Riot IDs cross-checked against vlr.gg and Liquipedia.',
   },
 ]
